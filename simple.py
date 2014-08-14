@@ -38,10 +38,13 @@ class VTKFrame(QtGui.QFrame):
  
         self.ren.AddActor(actor)
         self.ren.ResetCamera()
-        self.show()
+
+        self._initialized = False
 
     def showEvent(self, evt):
-        self.iren.Initialize()
+        if not self._initialized:
+            self.iren.Initialize()
+            self._initialized = True
  
 class MainPage(QtGui.QMainWindow):
     def __init__(self, parent = None):

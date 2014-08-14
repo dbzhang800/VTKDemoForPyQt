@@ -22,7 +22,7 @@ class MainWindow(QtGui.QMainWindow):
 
         for line in lines:
             line = line.strip()
-            if line:
+            if line and not line.startswith(('#', '//')):
                 try:
                     m = importlib.import_module(line)
                 except ImportError:
