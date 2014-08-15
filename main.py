@@ -227,19 +227,21 @@ class MainWindow(QtGui.QMainWindow):
                 self._pageTreeWidget.addPage(page)
                 page._filePath = line+'.py'
 
-        self.showSourceFile(self.centralWidget().currentWidget()._filePath)
+        self._currentPage = None
+        self.onPageItemActivated(self.centralWidget().currentWidget())
 
     def onPageItemActivated(self, page):
-        if page != self.centralWidget().currentWidget():
+        if page != self._currentPage:
             self.centralWidget().setCurrentWidget(page)
             self.showSourceFile(page._filePath)
+            self.setWindowTitle(u"VTK Demo for PyQt4 - {}".format(page._filePath))
 
     def showSourceFile(self, filePath):
         try:
             with file(filePath) as f:
                 contents = f.read()
         except IOError:
-            self._textView.setPlainText("Can not open file {}".format(filePath))
+            self._textView.setPlainText(u"Can not open file {}".format(filePath))
             return
 
         try:
