@@ -156,6 +156,11 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
+        self.setWindowTitle("Picker Example")
+
+    def categories(self):
+        return ['Simple']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

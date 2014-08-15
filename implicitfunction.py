@@ -76,6 +76,11 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
+        self.setWindowTitle("Simple Implicitfunction Example")
+
+    def categories(self):
+        return ['Simple', 'Implicit Function']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()
