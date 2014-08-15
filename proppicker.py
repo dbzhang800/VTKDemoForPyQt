@@ -159,7 +159,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Picker Example")
 
     def categories(self):
-        return ['Simple']
+        return ['Simple', 'Picker', 'Extrusion']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
