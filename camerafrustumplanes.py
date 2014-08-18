@@ -20,48 +20,33 @@ class VTKFrame(QtGui.QFrame):
         vl.setContentsMargins(0, 0, 0, 0)
  
         self.ren = vtk.vtkRenderer()
+        self.ren.SetBackground(0.1, 0.2, 0.4)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
+ 
+        # Create source
+        camera = vtk.vtkCamera()
+        planesArray = [0]*24
+        camera.GetFrustumPlanes(2, planesArray)
          
-        #Create a sphere
-        sphere = vtk.vtkSphereSource()
-        sphere.SetRadius(50)
-        sphere.SetThetaResolution(100)
-        sphere.SetPhiResolution(100)
+        planes = vtk.vtkPlanes()
+        planes.SetFrustumPlanes(planesArray)
          
-        plane = vtk.vtkPlane()
-        plane.SetOrigin(20, 0, 0)
-        plane.SetNormal(1, 0, 0)
+        frustumSource = vtk.vtkFrustumSource()
+        frustumSource.SetPlanes(planes)
+        frustumSource.Update()
          
-        #create cutter
-        cutter = vtk.vtkCutter()
-        cutter.SetCutFunction(plane)
-        cutter.SetInputConnection(sphere.GetOutputPort())
-        cutter.Update()
+        frustum = frustumSource.GetOutput()
          
-        cutStrips = vtk.vtkStripper()
-        cutStrips.SetInputConnection(cutter.GetOutputPort())
-        cutStrips.Update()
-        cutPoly = vtk.vtkPolyData()
-        cutPoly.SetPoints((cutStrips.GetOutput()).GetPoints())
-        cutPoly.SetPolys((cutStrips.GetOutput()).GetLines())
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInput(frustum)
          
-        cutMapper = vtk.vtkPolyDataMapper()
-        cutMapper.SetInput(cutPoly)
-        #cutMapper.SetInputConnection(cutter.GetOutputPort())
-         
-        cutActor = vtk.vtkActor()
-        cutActor.GetProperty().SetColor(1, 1, 0)
-        cutActor.GetProperty().SetEdgeColor(0, 1, 0)
-         
-        cutActor.GetProperty().SetLineWidth(2)
-        cutActor.GetProperty().EdgeVisibilityOn()
-        cutActor.SetMapper(cutMapper)
-
-        #create renderers and add actors of plane and cube
-        self.ren.AddActor(cutActor)
-
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+ 
+        self.ren.AddActor(actor)
         self.ren.ResetCamera()
+
         self._initialized = False
 
     def showEvent(self, evt):
@@ -79,10 +64,10 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Cut example")
+        self.setWindowTitle("Frustum from camera example")
 
     def categories(self):
-        return ['Cutter']
+        return ['Simple']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

@@ -1,6 +1,18 @@
 simple
+pointsource
 tworenders
 twoactors
+camerafrustumplanes
+polylines
+coloredlines
+coloredcube
+outlinefilter
+datasetsurface
+
+geometricobjects
+parametricobjects
+platonicsolidobjects
+curvatures
 
 proppicker
 implicitfunction

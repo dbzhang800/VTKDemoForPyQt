@@ -66,7 +66,12 @@ class VTKFrame(QtGui.QFrame):
     def showEvent(self, evt):
         if not self._initialized:
             self.iren.Initialize()
+            self.startTimer(30)
             self._initialized = True
+
+    def timerEvent(self, evt):
+        self.ren.GetActiveCamera().Azimuth(1)
+        self.vtkWidget.GetRenderWindow().Render()
  
 class MainPage(QtGui.QMainWindow):
     def __init__(self, parent = None):
