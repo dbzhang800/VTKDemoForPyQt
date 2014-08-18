@@ -20,48 +20,47 @@ class VTKFrame(QtGui.QFrame):
         vl.setContentsMargins(0, 0, 0, 0)
  
         self.ren = vtk.vtkRenderer()
-        self.ren.SetBackground(0.1, 0.2, 0.4)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
- 
-        # Create source
-        source = vtk.vtkConeSource()
-        source.SetHeight(3.0)
-        source.SetRadius(1.0)
-        source.SetResolution(20)
- 
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(source.GetOutputPort())
- 
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
- 
-        self.ren.AddActor(actor)
-        self.ren.ResetCamera()
 
+        superquadricSource = vtk.vtkSuperquadricSource()
+        superquadricSource.SetPhiRoundness(3.1)
+        superquadricSource.SetThetaRoundness(2.2)
+
+        clipPlane = vtk.vtkPlane()
+        clipPlane.SetNormal(1.0, -1.0, -1.0)
+        clipPlane.SetOrigin(0, 0, 0)
+
+        clipper = vtk.vtkClipPolyData()
+        clipper.SetInputConnection(superquadricSource.GetOutputPort())
+        clipper.SetClipFunction(clipPlane)
+
+        superquadricMapper = vtk.vtkPolyDataMapper()
+        superquadricMapper.SetInputConnection(clipper.GetOutputPort())
+
+        superquadricActor = vtk.vtkActor()
+        superquadricActor.SetMapper(superquadricMapper)
+
+        #create renderers and add actors of plane and cube
+        self.ren.AddActor(superquadricActor)
+
+        self.ren.ResetCamera()
         self._initialized = False
 
     def showEvent(self, evt):
         if not self._initialized:
             self.iren.Initialize()
-            self.startTimer(30)
             self._initialized = True
-
-    def timerEvent(self, evt):
-        self.ren.GetActiveCamera().Azimuth(1)
-        self.vtkWidget.GetRenderWindow().Render()
  
 class MainPage(QtGui.QMainWindow):
     def __init__(self, parent = None):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Simple VTK example")
+        self.setWindowTitle("Solid clip example")
 
     def categories(self):
-        return ['Simple']
+        return ['Clipper']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

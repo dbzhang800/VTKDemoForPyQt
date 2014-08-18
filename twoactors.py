@@ -37,8 +37,15 @@ class VTKFrame(QtGui.QFrame):
         # Create an actor
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
+
+        # Create another actor
+        actor2 = vtk.vtkActor()
+        actor2.SetMapper(mapper)
+        actor2.SetPosition(0, 2.0, 0)
+        actor2.GetProperty().SetColor(0.2, 0.63, 0.79)
  
         self.ren.AddActor(actor)
+        self.ren.AddActor(actor2)
         self.ren.ResetCamera()
 
         self._initialized = False
@@ -58,7 +65,7 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Simple VTK example")
+        self.setWindowTitle("Two actor example")
 
     def categories(self):
         return ['Simple']

@@ -15,14 +15,10 @@ class VTKFrame(QtGui.QFrame):
         super(VTKFrame, self).__init__(parent)
 
         self.vtkWidget = QVTKRenderWindowInteractor(self)
+        self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
         vl = QtGui.QVBoxLayout(self)
         vl.addWidget(self.vtkWidget)
         vl.setContentsMargins(0, 0, 0, 0)
- 
-        self.ren = vtk.vtkRenderer()
-        self.ren.SetBackground(0.1, 0.2, 0.4)
-        self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
-        self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
         # Create source
         source = vtk.vtkConeSource()
@@ -38,8 +34,21 @@ class VTKFrame(QtGui.QFrame):
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
  
-        self.ren.AddActor(actor)
-        self.ren.ResetCamera()
+        self.ren1 = vtk.vtkRenderer()
+        self.ren1.SetBackground(0.1, 0.2, 0.4)
+        self.ren1.SetViewport(0.0, 0.0, 0.5, 1.0)
+        self.ren1.AddActor(actor)
+
+        self.ren2 = vtk.vtkRenderer()
+        self.ren2.SetBackground(0.1, 0.2, 0.4)
+        self.ren2.SetViewport(0.5, 0.0, 1.0, 1.0)
+        self.ren2.AddActor(actor)
+
+        self.vtkWidget.GetRenderWindow().AddRenderer(self.ren1)
+        self.vtkWidget.GetRenderWindow().AddRenderer(self.ren2)
+ 
+        self.ren1.ResetCamera()
+        self.ren1.GetActiveCamera().Azimuth(90)
 
         self._initialized = False
 
@@ -50,7 +59,8 @@ class VTKFrame(QtGui.QFrame):
             self._initialized = True
 
     def timerEvent(self, evt):
-        self.ren.GetActiveCamera().Azimuth(1)
+        self.ren1.GetActiveCamera().Azimuth(1)
+        self.ren2.GetActiveCamera().Azimuth(1)
         self.vtkWidget.GetRenderWindow().Render()
  
 class MainPage(QtGui.QMainWindow):
@@ -58,7 +68,7 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Simple VTK example")
+        self.setWindowTitle("Two render example")
 
     def categories(self):
         return ['Simple']
