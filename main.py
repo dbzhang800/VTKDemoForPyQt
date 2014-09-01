@@ -25,26 +25,20 @@ class PageTreeWidget(QtGui.QTreeWidget):
     def __init__(self, parent = None):
         super(PageTreeWidget, self).__init__(parent)
         self.header().hide()
-        self._categoryDict = {}
 
         self.itemActivated.connect(self.onItemActived)
 
-    def addPage(self, page):
-        pageName = page.windowTitle()
-        try:
-            categories = page.categories()
-        except:
-            categories = ['Ungrouped']
+    def setCategoryDict(self, categoryDict):
+        keys = categoryDict.keys()
+        keys.sort()
 
-        for category in categories:
-            try:
-                categoryItem = self._categoryDict[category]
-            except KeyError:
-                categoryItem = QtGui.QTreeWidgetItem(self, [category,], self.CATEGORY_ITEM)
-                self._categoryDict[category] = categoryItem
-
-            pageItem = QtGui.QTreeWidgetItem(categoryItem, [pageName,], self.PAGE_ITEM)
-            pageItem._page = page
+        for key in keys:
+            categoryItem = QtGui.QTreeWidgetItem(self, [key,], self.CATEGORY_ITEM)
+            pages = categoryDict[key]
+            pages.sort(key=lambda page:page.windowTitle())
+            for page in pages:
+                pageItem = QtGui.QTreeWidgetItem(categoryItem, [page.windowTitle(),], self.PAGE_ITEM)
+                pageItem._page = page
 
     def onItemActived(self, item, column):
         if item.type() == self.PAGE_ITEM:
@@ -212,6 +206,7 @@ class MainWindow(QtGui.QMainWindow):
         with file('pluginslist') as f:
             lines = f.read().splitlines()
 
+        categoryDict = {}
         for line in lines:
             line = line.strip()
             if line and not line.startswith(('#', '//')):
@@ -224,8 +219,22 @@ class MainWindow(QtGui.QMainWindow):
                     page.setWindowTitle(line)
 
                 self.centralWidget().addWidget(page)
-                self._pageTreeWidget.addPage(page)
                 page._filePath = line+'.py'
+
+                try:
+                    categories = page.categories()
+                except:
+                    categories = ['Ungrouped']
+
+                for category in categories:
+                    try:
+                        pages = categoryDict[category]
+                    except KeyError:
+                        pages = []
+                        categoryDict[category] = pages
+                    pages.append(page)
+
+        self._pageTreeWidget.setCategoryDict(categoryDict)
 
         self._currentPage = None
         self.onPageItemActivated(self.centralWidget().currentWidget())
