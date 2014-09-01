@@ -20,7 +20,7 @@ class VTKFrame(QtGui.QFrame):
         vl.setContentsMargins(0, 0, 0, 0)
  
         self.ren = vtk.vtkRenderer()
-        self.ren.SetBackground(0.1, 0.2, 0.4)
+        self.ren.SetBackground(0.3, 0.6, 0.3)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
@@ -34,15 +34,18 @@ class VTKFrame(QtGui.QFrame):
 
         # Create anything you want here, we will use a cube for the demo.
         cubeSource = vtk.vtkCubeSource()
-
-        glyph3dMapper = vtk.vtkGlyph3DMapper()
-        glyph3dMapper.SetSourceConnection(cubeSource.GetOutputPort())
-        glyph3dMapper.SetInputConnection(polyData.GetProducerPort())
-        glyph3dMapper.Update()
-
+        glyph3D = vtk.vtkGlyph3D()
+        glyph3D.SetSourceConnection(cubeSource.GetOutputPort())
+        glyph3D.SetInput(polyData)
+        glyph3D.Update()
+ 
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(glyph3D.GetOutputPort())
+ 
         # Create an actor
         actor = vtk.vtkActor()
-        actor.SetMapper(glyph3dMapper)
+        actor.SetMapper(mapper)
  
         self.ren.AddActor(actor)
         self.ren.ResetCamera()
@@ -64,10 +67,10 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Glyph3D Mapper")
+        self.setWindowTitle("Glyph3D example")
 
     def categories(self):
-        return ['Simple', 'vtkGlyph3DMapper']
+        return ['vtkGlyph3D']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

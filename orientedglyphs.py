@@ -24,25 +24,29 @@ class VTKFrame(QtGui.QFrame):
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
-        points = vtk.vtkPoints()
-        points.InsertNextPoint(0, 0, 0)
-        points.InsertNextPoint(1, 1, 1)
-        points.InsertNextPoint(2, 2, 2)
+        # Create source
+        sphereSource = vtk.vtkSphereSource()
+        sphereSource.Update()
 
-        polyData = vtk.vtkPolyData()
-        polyData.SetPoints(points)
+        input_ = vtk.vtkPolyData()
+        input_.ShallowCopy(sphereSource.GetOutput())
 
-        # Create anything you want here, we will use a cube for the demo.
-        cubeSource = vtk.vtkCubeSource()
+        arrowSource = vtk.vtkArrowSource()
 
-        glyph3dMapper = vtk.vtkGlyph3DMapper()
-        glyph3dMapper.SetSourceConnection(cubeSource.GetOutputPort())
-        glyph3dMapper.SetInputConnection(polyData.GetProducerPort())
-        glyph3dMapper.Update()
-
+        glyph3D = vtk.vtkGlyph3D()
+        glyph3D.SetSourceConnection(arrowSource.GetOutputPort())
+        glyph3D.SetVectorModeToUseNormal()
+        glyph3D.SetInput(input_)
+        glyph3D.SetScaleFactor(0.2)
+        glyph3D.Update()
+ 
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(glyph3D.GetOutputPort())
+ 
         # Create an actor
         actor = vtk.vtkActor()
-        actor.SetMapper(glyph3dMapper)
+        actor.SetMapper(mapper)
  
         self.ren.AddActor(actor)
         self.ren.ResetCamera()
@@ -64,10 +68,10 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Glyph3D Mapper")
+        self.setWindowTitle("Oriented Glyphs example")
 
     def categories(self):
-        return ['Simple', 'vtkGlyph3DMapper']
+        return ['vtkGlyph3D']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

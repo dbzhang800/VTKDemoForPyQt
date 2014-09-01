@@ -20,29 +20,47 @@ class VTKFrame(QtGui.QFrame):
         vl.setContentsMargins(0, 0, 0, 0)
  
         self.ren = vtk.vtkRenderer()
-        self.ren.SetBackground(0.1, 0.2, 0.4)
+        self.ren.SetBackground(1, 1, 1)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
+        # Create points
         points = vtk.vtkPoints()
         points.InsertNextPoint(0, 0, 0)
-        points.InsertNextPoint(1, 1, 1)
-        points.InsertNextPoint(2, 2, 2)
+        points.InsertNextPoint(5, 0, 0)
+        points.InsertNextPoint(10, 0, 0)
 
+        # Setup scales. This can also be an Int array
+        # char is used since it takes the least memory
+        colors = vtk.vtkUnsignedCharArray()
+        colors.SetName("colors")
+        colors.SetNumberOfComponents(3)
+        colors.InsertNextTupleValue((255, 0, 0))
+        colors.InsertNextTupleValue((0, 255, 0))
+        colors.InsertNextTupleValue((0, 0, 255))
+
+        # Combine into a polydata
         polyData = vtk.vtkPolyData()
         polyData.SetPoints(points)
+        polyData.GetPointData().SetScalars(colors)
 
         # Create anything you want here, we will use a cube for the demo.
         cubeSource = vtk.vtkCubeSource()
+        
+        glyph3D = vtk.vtkGlyph3D()
+        glyph3D.SetColorModeToColorByScalar()
+        glyph3D.SetSourceConnection(cubeSource.GetOutputPort())
+        glyph3D.SetInput(polyData)
+        glyph3D.ScalingOff() #Needed, otherwise only the red cube is visible
+        glyph3D.Update()
 
-        glyph3dMapper = vtk.vtkGlyph3DMapper()
-        glyph3dMapper.SetSourceConnection(cubeSource.GetOutputPort())
-        glyph3dMapper.SetInputConnection(polyData.GetProducerPort())
-        glyph3dMapper.Update()
-
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(glyph3D.GetOutputPort())
+ 
         # Create an actor
         actor = vtk.vtkActor()
-        actor.SetMapper(glyph3dMapper)
+        actor.SetMapper(mapper)
  
         self.ren.AddActor(actor)
         self.ren.ResetCamera()
@@ -64,10 +82,10 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Glyph3D Mapper")
+        self.setWindowTitle("Color Glyphs Example")
 
     def categories(self):
-        return ['Simple', 'vtkGlyph3DMapper']
+        return ['vtkGlyph3D']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

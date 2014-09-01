@@ -26,3 +26,7 @@ interactorstyle
 distancetocamera
 
 quadraticsuface
+orientedglyphs
+colorglyphs
+glyph2d
+glyph3d

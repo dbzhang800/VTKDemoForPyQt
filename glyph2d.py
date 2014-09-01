@@ -26,23 +26,26 @@ class VTKFrame(QtGui.QFrame):
  
         points = vtk.vtkPoints()
         points.InsertNextPoint(0, 0, 0)
-        points.InsertNextPoint(1, 1, 1)
-        points.InsertNextPoint(2, 2, 2)
+        points.InsertNextPoint(1, 1, 0)
+        points.InsertNextPoint(2, 2, 0)
 
         polyData = vtk.vtkPolyData()
         polyData.SetPoints(points)
 
-        # Create anything you want here, we will use a cube for the demo.
-        cubeSource = vtk.vtkCubeSource()
-
-        glyph3dMapper = vtk.vtkGlyph3DMapper()
-        glyph3dMapper.SetSourceConnection(cubeSource.GetOutputPort())
-        glyph3dMapper.SetInputConnection(polyData.GetProducerPort())
-        glyph3dMapper.Update()
-
+        # Create anything you want here, we will use a polygon for the demo.
+        polygonSource = vtk.vtkRegularPolygonSource() #default is 6 sides
+        glyph2D = vtk.vtkGlyph2D()
+        glyph2D.SetSourceConnection(polygonSource.GetOutputPort())
+        glyph2D.SetInput(polyData)
+        glyph2D.Update()
+ 
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(glyph2D.GetOutputPort())
+ 
         # Create an actor
         actor = vtk.vtkActor()
-        actor.SetMapper(glyph3dMapper)
+        actor.SetMapper(mapper)
  
         self.ren.AddActor(actor)
         self.ren.ResetCamera()
@@ -52,7 +55,7 @@ class VTKFrame(QtGui.QFrame):
     def showEvent(self, evt):
         if not self._initialized:
             self.iren.Initialize()
-            self.startTimer(30)
+            #self.startTimer(30)
             self._initialized = True
 
     def timerEvent(self, evt):
@@ -64,10 +67,10 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Glyph3D Mapper")
+        self.setWindowTitle("Glyph2D example")
 
     def categories(self):
-        return ['Simple', 'vtkGlyph3DMapper']
+        return ['vtkGlyph2D']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
