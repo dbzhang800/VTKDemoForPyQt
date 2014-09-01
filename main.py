@@ -12,6 +12,7 @@ import sys
 import os.path
 import importlib
 import weakref
+import glob
 
 from PyQt4 import QtCore, QtGui
 QtCore.Signal = QtCore.pyqtSignal
@@ -203,36 +204,38 @@ class MainWindow(QtGui.QMainWindow):
         self.loadPages()
 
     def loadPages(self):
-        with file('pluginslist') as f:
-            lines = f.read().splitlines()
+        files = glob.glob('*.py')
+        files.remove(__file__) #Remove current main file
 
         categoryDict = {}
-        for line in lines:
-            line = line.strip()
-            if line and not line.startswith(('#', '//')):
-                try:
-                    m = importlib.import_module(line)
-                except ImportError:
-                    continue
+        for filePath in files:
+            line = filePath[:-3]
+            try:
+                m = importlib.import_module(line)
+            except ImportError:
+                continue
+            try:
                 page = m.MainPage()
-                if not page.windowTitle():
-                    page.setWindowTitle(line)
+            except AttributeError:
+                continue
+            if not page.windowTitle():
+                page.setWindowTitle(line)
 
-                self.centralWidget().addWidget(page)
-                page._filePath = line+'.py'
+            self.centralWidget().addWidget(page)
+            page._filePath = filePath
 
+            try:
+                categories = page.categories()
+            except:
+                categories = ['Ungrouped']
+
+            for category in categories:
                 try:
-                    categories = page.categories()
-                except:
-                    categories = ['Ungrouped']
-
-                for category in categories:
-                    try:
-                        pages = categoryDict[category]
-                    except KeyError:
-                        pages = []
-                        categoryDict[category] = pages
-                    pages.append(page)
+                    pages = categoryDict[category]
+                except KeyError:
+                    pages = []
+                    categoryDict[category] = pages
+                pages.append(page)
 
         self._pageTreeWidget.setCategoryDict(categoryDict)
 
