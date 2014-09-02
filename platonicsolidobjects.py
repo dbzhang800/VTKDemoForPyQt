@@ -146,6 +146,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Geometric Objects']
 
+    def mainClasses(self):
+        return ['vtkLookupTable', 'vtkPlatonicSolidSource', 'vtkTextProperty']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

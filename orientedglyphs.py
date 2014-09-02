@@ -71,7 +71,10 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Oriented Glyphs example")
 
     def categories(self):
-        return ['vtkGlyph3D']
+        return ['glyph3d']
+
+    def mainClasses(self):
+        return ['vtkGlyph3D', 'vtkSphereSource', 'vtkArrowSource']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

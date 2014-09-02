@@ -85,7 +85,10 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Color Glyphs Example")
 
     def categories(self):
-        return ['vtkGlyph3D']
+        return ['glyph3d']
+
+    def mainClasses(self):
+        return ['vtkGlyph3D', 'vtkPoints']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

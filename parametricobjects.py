@@ -152,6 +152,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Geometric Objects']
 
+    def mainClasses(self):
+        return ['vtkParametricBoy', 'vtkParametricConicSpiral', 'vtkParametricCrossCap', 'vtkParametricDini', 'vtkParametricEllipsoid', 'vtkParametricEnneper', 'vtkParametricFigure8Klein', 'vtkParametricKlein', 'vtkParametricMobius', 'vtkParametricRandomHills', 'vtkParametricRoman', 'vtkParametricSuperEllipsoid', 'vtkParametricSuperToroid', 'vtkParametricTorus', 'vtkParametricSpline', 'vtkParametricFunctionSource', 'vtkPoints', 'vtkTextProperty']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

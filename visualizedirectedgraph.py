@@ -104,6 +104,9 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Visualize Directed Graph")
 
     def categories(self):
+        return ['demo']
+
+    def mainClasses(self):
         return ['vtkGlyph3D', 'vtkMutableDirectedGraph']
 
 if __name__ == '__main__':

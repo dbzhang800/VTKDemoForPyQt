@@ -88,6 +88,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Implicit Function']
 
+    def mainClasses(self):
+        return ['vtkSphere', 'vtkSampleFunction', 'vtkContourFilter', 'vtkOutlineFilter']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

@@ -70,7 +70,10 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Glyph2D example")
 
     def categories(self):
-        return ['vtkGlyph2D']
+        return ['glyph2d']
+
+    def mainClasses(self):
+        return ['vtkGlyph2D', 'vtkPoints', 'vtkRegularPolygonSource']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

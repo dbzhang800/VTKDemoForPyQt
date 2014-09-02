@@ -89,6 +89,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Clipper', 'Implict Data Set']
 
+    def mainClasses(self):
+        return ['vtkSphereSource', 'vtkDelaunay3D', 'vtkElevationFilter', 'vtkImplicitDataSet', 'vtkDataSetMapper', 'vtkClipPolyData']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

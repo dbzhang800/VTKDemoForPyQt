@@ -72,6 +72,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Demo']
 
+    def mainClasses(self):
+        return ['vtkInteractorStyle', 'vtkSphereSource']
+
     def _createDockWidget(self):
         self._interactorStylesWidget = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self._interactorStylesWidget)

@@ -17,14 +17,14 @@ import glob
 from PyQt4 import QtCore, QtGui
 QtCore.Signal = QtCore.pyqtSignal
 
-class PageTreeWidget(QtGui.QTreeWidget):
+class CategoryTreeWidget(QtGui.QTreeWidget):
     CATEGORY_ITEM = 1
     PAGE_ITEM = 2
 
     pageItemActivated = QtCore.Signal(object)
 
     def __init__(self, parent = None):
-        super(PageTreeWidget, self).__init__(parent)
+        super(CategoryTreeWidget, self).__init__(parent)
         self.header().hide()
 
         self.itemActivated.connect(self.onItemActived)
@@ -44,6 +44,9 @@ class PageTreeWidget(QtGui.QTreeWidget):
     def onItemActived(self, item, column):
         if item.type() == self.PAGE_ITEM:
             self.pageItemActivated.emit(item._page)
+            #Open source file with gvim for edit
+            #import subprocess
+            #subprocess.call(['gvim', item._page._filePath])
 
 class LineNumberArea(QtGui.QWidget):
     u"""Line Number Area for CodeEdit"""
@@ -195,12 +198,18 @@ class MainWindow(QtGui.QMainWindow):
         dockWidget.setWidget(self._textView)
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, dockWidget)
 
-        self._pageTreeWidget = PageTreeWidget()
-        dockWidget = QtGui.QDockWidget("Examples")
-        dockWidget.setWidget(self._pageTreeWidget)
+        self._categoryTreeWidget = CategoryTreeWidget()
+        dockWidget = QtGui.QDockWidget("Categories")
+        dockWidget.setWidget(self._categoryTreeWidget)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dockWidget)
 
-        self._pageTreeWidget.pageItemActivated.connect(self.onPageItemActivated)
+        self._classTreeWidget = CategoryTreeWidget()
+        dockWidget = QtGui.QDockWidget("vtkClasses")
+        dockWidget.setWidget(self._classTreeWidget)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dockWidget)
+
+        self._categoryTreeWidget.pageItemActivated.connect(self.onPageItemActivated)
+        self._classTreeWidget.pageItemActivated.connect(self.onPageItemActivated)
         self.loadPages()
 
     def loadPages(self):
@@ -208,6 +217,7 @@ class MainWindow(QtGui.QMainWindow):
         files.remove(__file__) #Remove current main file
 
         categoryDict = {}
+        classesDict = {}
         for filePath in files:
             line = filePath[:-3]
             try:
@@ -237,7 +247,21 @@ class MainWindow(QtGui.QMainWindow):
                     categoryDict[category] = pages
                 pages.append(page)
 
-        self._pageTreeWidget.setCategoryDict(categoryDict)
+            try:
+                classes = page.mainClasses()
+            except:
+                classes = ['Unknown']
+
+            for class_ in classes:
+                try:
+                    pages = classesDict[class_]
+                except KeyError:
+                    pages = []
+                    classesDict[class_] = pages
+                pages.append(page)
+
+        self._categoryTreeWidget.setCategoryDict(categoryDict)
+        self._classTreeWidget.setCategoryDict(classesDict)
 
         self._currentPage = None
         self.onPageItemActivated(self.centralWidget().currentWidget())

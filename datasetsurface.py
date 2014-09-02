@@ -130,6 +130,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Simple', 'Cutter']
 
+    def mainClasses(self):
+        return ['vtkPoints', 'vtkHexahedron', 'vtkCellArray', 'vtkCutter', 'vtkDataSetSurfaceFilter', 'vtkUnstructuredGrid', 'vtkPlane']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

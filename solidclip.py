@@ -62,6 +62,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Clipper']
 
+    def mainClasses(self):
+        return ['vtkSuperquadricSource', 'vtkPlane', 'vtkClipPolyData']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

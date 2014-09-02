@@ -64,6 +64,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Simple']
 
+    def mainClasses(self):
+        return ['vtkPointSource']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

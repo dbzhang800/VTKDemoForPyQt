@@ -67,7 +67,11 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Glyph3D Mapper")
 
     def categories(self):
-        return ['Simple', 'vtkGlyph3DMapper']
+        return ['Simple']
+
+    def mainClasses(self):
+        return ['vtkGlyph3DMapper', 'vtkPoints']
+
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

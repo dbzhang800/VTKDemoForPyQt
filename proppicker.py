@@ -161,6 +161,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Simple', 'Picker', 'Extrusion']
 
+    def mainClasses(self):
+        return ['vtkPoints', 'vtkPolygon', 'vtkCellArray', 'vtkRotationalExtrusionFilter', 'vtkSphereSource']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

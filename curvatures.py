@@ -187,6 +187,9 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Geometric Objects']
 
+    def mainClasses(self):
+        return ['vtkSuperquadricSource', 'vtkTransformFilter', 'vtkTriangleFilter', 'vtkCurvatures', 'vtkParametricFunctionSource', 'vtkParametricRandomHills', 'vtkLookupTable', 'vtkTextProperty']
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()

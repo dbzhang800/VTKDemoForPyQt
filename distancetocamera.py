@@ -112,6 +112,10 @@ class MainPage(QtGui.QMainWindow):
     def categories(self):
         return ['Demo']
 
+    def mainClasses(self):
+        return ['vtkPointSource', 'vtkDistanceToCamera', 'vtkArrowSource', 'vtkGlyph3D']
+
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     w = MainPage()
