@@ -83,7 +83,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Tube Filter example")
 
     def categories(self):
-        return ['Simple', 'Tube']
+        return ['Simple', 'Tube', 'Filters']
 
     def mainClasses(self):
         return ['vtkLineSource', 'vtkTubeFilter']

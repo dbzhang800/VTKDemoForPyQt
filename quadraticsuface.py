@@ -70,7 +70,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Quadrctic Suface example")
 
     def categories(self):
-        return ['Implicit Function']
+        return ['Implicit Function', 'Filters']
 
     def mainClasses(self):
         return ['vtkQuadric', 'vtkSampleFunction', 'vtkContourFilter']

@@ -111,7 +111,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Spiral tube example")
 
     def categories(self):
-        return ['Demo', 'Tube']
+        return ['Demo', 'Tube', 'Filters']
 
     def mainClasses(self):
         return ['vtkPoints', 'vtkCellArray', 'vtkTubeFilter', 'vtkPolyData']

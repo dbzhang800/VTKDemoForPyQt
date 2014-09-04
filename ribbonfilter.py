@@ -21,21 +21,20 @@ class VTKFrame(QtGui.QFrame):
         vl.setContentsMargins(0, 0, 0, 0)
  
         self.ren = vtk.vtkRenderer()
-        self.ren.SetBackground(0.2, 0.3, 0.4)
+        self.ren.SetBackground(0.1, 0.2, 0.4)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
- 
-        # Create Spiral tube
-        nV = 256 #No. of vertices
-        nCyc = 5 #No. of spiral cycles
-        rS = 2.0   #Spiral radius
-        h = 10.0
-        nTv = 8 #No. of surface elements for each tube vertex
 
+        nV = 256 # No. of vertices
+        rS = 2.0 # Spiral radius
+        nCyc = 3 # No. of spiral cycles
+        h = 10.0 # Height
+
+        # Create points and cells for a spiral
         points = vtk.vtkPoints()
         for i in range(nV):
-            vX = rS * math.cos(2 * math.pi * nCyc * i / (nV-1))
-            vY = rS * math.sin(2 * math.pi * nCyc * i / (nV-1))
+            vX = rS * math.cos(2 * math.pi * nCyc * i / (nV - 1))
+            vY = rS * math.sin(2 * math.pi * nCyc * i / (nV - 1))
             vZ = h * i / nV
             points.InsertPoint(i, vX, vY, vZ)
 
@@ -48,19 +47,29 @@ class VTKFrame(QtGui.QFrame):
         polyData.SetPoints(points)
         polyData.SetLines(lines)
 
-        tube = vtk.vtkTubeFilter()
-        tube.SetInput(polyData)
-        tube.SetNumberOfSides(nTv)
+        # Create a mapper and actor
+        lineMapper = vtk.vtkPolyDataMapper()
+        lineMapper.SetInput(polyData)
+
+        lineActor = vtk.vtkActor()
+        lineActor.SetMapper(lineMapper)
+        lineActor.GetProperty().SetColor(0.8, 0.4, 0.2)
+        lineActor.GetProperty().SetLineWidth(3)
+
+        # Cteate a ribbon around the line
+        ribbonFilter = vtk.vtkRibbonFilter()
+        ribbonFilter.SetInput(polyData)
+        ribbonFilter.SetWidth(0.4)
+
+        # Create a mapper and actor
+        ribbonMapper = vtk.vtkPolyDataMapper()
+        ribbonMapper.SetInputConnection(ribbonFilter.GetOutputPort())
+
+        ribbonActor = vtk.vtkActor()
+        ribbonActor.SetMapper(ribbonMapper)
  
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(tube.GetOutputPort())
- 
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
- 
-        self.ren.AddActor(actor)
+        self.ren.AddActor(lineActor)
+        self.ren.AddActor(ribbonActor)
         self.ren.ResetCamera()
 
         self._initialized = False
@@ -68,7 +77,7 @@ class VTKFrame(QtGui.QFrame):
     def showEvent(self, evt):
         if not self._initialized:
             self.iren.Initialize()
-            #self.startTimer(30)
+            self.startTimer(30)
             self._initialized = True
 
     def timerEvent(self, evt):
@@ -80,13 +89,13 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Tube example")
+        self.setWindowTitle("Ribbon Filter Example")
 
     def categories(self):
-        return ['Simple', 'Tube', 'Filters']
+        return ['Simple', 'Filters']
 
     def mainClasses(self):
-        return ['vtkPoints', 'vtkCellArray', 'vtkTubeFilter', 'vtkPolyData']
+        return ['vtkRibbonFilter', 'vtkPoints', 'vtkLine', 'vtkCellArray']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

@@ -159,7 +159,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Picker Example")
 
     def categories(self):
-        return ['Simple', 'Picker', 'Extrusion']
+        return ['Simple', 'Picker', 'Extrusion', 'Filters']
 
     def mainClasses(self):
         return ['vtkPoints', 'vtkPolygon', 'vtkCellArray', 'vtkRotationalExtrusionFilter', 'vtkSphereSource']

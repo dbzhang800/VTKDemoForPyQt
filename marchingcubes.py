@@ -23,32 +23,44 @@ class VTKFrame(QtGui.QFrame):
         self.ren.SetBackground(0.1, 0.2, 0.4)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
- 
-        # Create source
-        source = vtk.vtkConeSource()
-        source.SetHeight(3.0)
-        source.SetRadius(1.0)
-        source.SetResolution(20)
+
+        sphereSource = vtk.vtkSphereSource()
+        sphereSource.SetPhiResolution(20)
+        sphereSource.SetThetaResolution(20)
+        sphereSource.Update()
+
+        bounds = [1, 1, 1, 1, 1, 1]
+        sphereSource.GetOutput().GetBounds(bounds)
+        for i in range(0, 6, 2):
+            range_ = bounds[i+1] - bounds[i]
+            bounds[i] = bounds[i] - 0.1 * range_
+            bounds[i+1] = bounds[i+1] + 0.1 * range_
+
+        voxelModeller = vtk.vtkVoxelModeller()
+        voxelModeller.SetSampleDimensions(50, 50, 50)
+        voxelModeller.SetModelBounds(bounds)
+        voxelModeller.SetScalarTypeToFloat()
+        voxelModeller.SetMaximumDistance(0.1)
+
+        voxelModeller.SetInputConnection(sphereSource.GetOutputPort())
+        voxelModeller.Update()
+
+        volume = vtk.vtkImageData()
+        volume.DeepCopy(voxelModeller.GetOutput())
+
+        surface = vtk.vtkMarchingCubes()
+        surface.SetInput(volume)
+        surface.SetValue(0, 0.5)
  
         # Create a mapper
         mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(source.GetOutputPort())
+        mapper.SetInputConnection(surface.GetOutputPort())
  
         # Create an actor
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
-
-        self.ren.AddActor(actor)
-
-        # outline
-        outline = vtk.vtkOutlineFilter()
-        outline.SetInputConnection(source.GetOutputPort())
-        mapper2 = vtk.vtkPolyDataMapper()
-        mapper2.SetInputConnection(outline.GetOutputPort())
-        actor2 = vtk.vtkActor()
-        actor2.SetMapper(mapper2)
-        self.ren.AddActor(actor2)
  
+        self.ren.AddActor(actor)
         self.ren.ResetCamera()
 
         self._initialized = False
@@ -68,13 +80,13 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Outline filter example")
+        self.setWindowTitle("Marching Cubes example")
 
     def categories(self):
-        return ['Simple', 'Filters']
+        return ['Simple']
 
     def mainClasses(self):
-        return ['vtkConeSource', 'vtkOutlineFilter']
+        return ['vtkMarchingCubes', 'vtkVoxelModeller', 'vtkImageData']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

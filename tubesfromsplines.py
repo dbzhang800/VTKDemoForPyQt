@@ -120,7 +120,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Tube From Splines example")
 
     def categories(self):
-        return ['Simple', 'Tube']
+        return ['Simple', 'Tube', 'Filters']
 
     def mainClasses(self):
         return ['vtkTubeFilter']

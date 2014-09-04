@@ -25,30 +25,33 @@ class VTKFrame(QtGui.QFrame):
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
         # Create source
-        source = vtk.vtkConeSource()
-        source.SetHeight(3.0)
-        source.SetRadius(1.0)
-        source.SetResolution(20)
- 
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(source.GetOutputPort())
- 
-        # Create an actor
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
+        sphereSource = vtk.vtkSphereSource()
+        sphereSource.SetPhiResolution(50)
+        sphereSource.SetThetaResolution(50)
+        sphereSource.Update()
 
-        self.ren.AddActor(actor)
+        # Sample the sphere
+        pointSampler = vtk.vtkPolyDataPointSampler()
+        pointSampler.SetDistance(0.01)
+        pointSampler.SetInputConnection(sphereSource.GetOutputPort())
+        pointSampler.Update()
 
-        # outline
-        outline = vtk.vtkOutlineFilter()
-        outline.SetInputConnection(source.GetOutputPort())
-        mapper2 = vtk.vtkPolyDataMapper()
-        mapper2.SetInputConnection(outline.GetOutputPort())
-        actor2 = vtk.vtkActor()
-        actor2.SetMapper(mapper2)
-        self.ren.AddActor(actor2)
+        # Visualize
+        sphereMapper = vtk.vtkPolyDataMapper()
+        sphereMapper.SetInputConnection(sphereSource.GetOutputPort())
+
+        sphereActor = vtk.vtkActor()
+        sphereActor.SetMapper(sphereMapper)
+        
+        sampleMapper = vtk.vtkPolyDataMapper()
+        sampleMapper.SetInputConnection(pointSampler.GetOutputPort())
+
+        sampleActor = vtk.vtkActor()
+        sampleActor.SetMapper(sampleMapper)
+        sampleActor.GetProperty().SetColor(1, 0, 0)
  
+        self.ren.AddActor(sphereActor)
+        self.ren.AddActor(sampleActor)
         self.ren.ResetCamera()
 
         self._initialized = False
@@ -68,13 +71,13 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Outline filter example")
+        self.setWindowTitle("Polydata Point Sampler example")
 
     def categories(self):
-        return ['Simple', 'Filters']
+        return ['Simple']
 
     def mainClasses(self):
-        return ['vtkConeSource', 'vtkOutlineFilter']
+        return ['vtkPolyDataPointSampler']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

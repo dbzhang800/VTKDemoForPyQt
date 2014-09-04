@@ -79,7 +79,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Simple Implicitfunction Example")
 
     def categories(self):
-        return ['Simple', 'Implicit Function']
+        return ['Simple', 'Implicit Function', 'Filters']
 
     def mainClasses(self):
         return ['vtkCylinder', 'vtkPlane', 'vtkImplicitBoolean', 'vtkSampleFunction', 'vtkContourFilter']

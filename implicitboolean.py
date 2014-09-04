@@ -24,31 +24,37 @@ class VTKFrame(QtGui.QFrame):
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
-        # Create source
-        source = vtk.vtkConeSource()
-        source.SetHeight(3.0)
-        source.SetRadius(1.0)
-        source.SetResolution(20)
+        sphere1 = vtk.vtkSphere()
+        sphere1.SetCenter(0.9, 0, 0)
+        sphere2 = vtk.vtkSphere()
+        sphere2.SetCenter(-0.9, 0, 0)
+
+        implicitBoolean = vtk.vtkImplicitBoolean()
+        implicitBoolean.AddFunction(sphere1)
+        implicitBoolean.AddFunction(sphere2)
+        implicitBoolean.SetOperationTypeToUnion()
+        #implicitBoolean.SetOperationTypeToIntersection()
+
+        # Sample the function
+        sample = vtk.vtkSampleFunction()
+        sample.SetSampleDimensions(50, 50, 50)
+        sample.SetImplicitFunction(implicitBoolean)
+        sample.SetModelBounds(-3, 3, -3, 3, -3, 3)
+
+        # Create the 0 isosurface
+        contours = vtk.vtkContourFilter()
+        contours.SetInputConnection(sample.GetOutputPort())
+        contours.GenerateValues(1, 1, 1)
  
         # Create a mapper
         mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(source.GetOutputPort())
+        mapper.SetInputConnection(contours.GetOutputPort())
  
         # Create an actor
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
-
-        self.ren.AddActor(actor)
-
-        # outline
-        outline = vtk.vtkOutlineFilter()
-        outline.SetInputConnection(source.GetOutputPort())
-        mapper2 = vtk.vtkPolyDataMapper()
-        mapper2.SetInputConnection(outline.GetOutputPort())
-        actor2 = vtk.vtkActor()
-        actor2.SetMapper(mapper2)
-        self.ren.AddActor(actor2)
  
+        self.ren.AddActor(actor)
         self.ren.ResetCamera()
 
         self._initialized = False
@@ -68,13 +74,13 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Outline filter example")
+        self.setWindowTitle("Implicit Boolean example")
 
     def categories(self):
-        return ['Simple', 'Filters']
+        return ['Implicit Function', 'Filters']
 
     def mainClasses(self):
-        return ['vtkConeSource', 'vtkOutlineFilter']
+        return ['vtkSampleFunction', 'vtkContourFilter', 'vtkImplicitBoolean', 'vtkSphere']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

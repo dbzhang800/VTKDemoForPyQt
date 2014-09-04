@@ -87,7 +87,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Implicit data set example")
 
     def categories(self):
-        return ['Clipper', 'Implict Data Set']
+        return ['Clipper', 'Implict Data Set', 'Filters']
 
     def mainClasses(self):
         return ['vtkSphereSource', 'vtkDelaunay3D', 'vtkElevationFilter', 'vtkImplicitDataSet', 'vtkDataSetMapper', 'vtkClipPolyData']

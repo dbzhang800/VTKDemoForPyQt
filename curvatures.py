@@ -185,7 +185,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("Curvatures example")
 
     def categories(self):
-        return ['Geometric Objects']
+        return ['Geometric Objects', 'Filters']
 
     def mainClasses(self):
         return ['vtkSuperquadricSource', 'vtkTransformFilter', 'vtkTriangleFilter', 'vtkCurvatures', 'vtkParametricFunctionSource', 'vtkParametricRandomHills', 'vtkLookupTable', 'vtkTextProperty']
