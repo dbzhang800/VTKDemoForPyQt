@@ -145,7 +145,7 @@ class MainPage(QtGui.QMainWindow):
         self.setWindowTitle("External Contour example")
 
     def categories(self):
-        return ['Deom']
+        return ['Demo']
 
     def mainClasses(self):
         return ['vtkWindowToImageFilter', 'vtkContourFilter', 'vtkTransformPolyDataFilter']
