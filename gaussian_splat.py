@@ -24,25 +24,26 @@ class VTKFrame(QtGui.QFrame):
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
-        # Create the quadric function definition
-        quadric = vtk.vtkQuadric()
-        quadric.SetCoefficients(0.5, 1, 0.2, 0, 0.1, 0, 0, 0.2, 0, 0)
-        #quadric.SetCoefficients(0.5, 0, 0.2, 0, 0, 0, 0, 0, 0, -0.1)
+        # Create source
+        sphereSource = vtk.vtkSphereSource()
+        sphereSource.Update()
 
-        # Sample the quadric function
-        sample = vtk.vtkSampleFunction()
-        sample.SetSampleDimensions(50, 50, 50)
-        sample.SetImplicitFunction(quadric)
-        sample.SetModelBounds(-1, 1, -1, 1, -1, 1)
+        polydata = vtk.vtkPolyData()
+        polydata.SetPoints(sphereSource.GetOutput().GetPoints())
 
-        contourFilter = vtk.vtkContourFilter()
-        contourFilter.SetInputConnection(sample.GetOutputPort())
-        #contourFilter.GenerateValues(1, 1, 1)
-        contourFilter.Update()
+        splatter = vtk.vtkGaussianSplatter()
+        splatter.SetInput(polydata)
+        splatter.SetSampleDimensions(50, 50, 50)
+        splatter.SetRadius(0.05)
+        splatter.ScalarWarpingOff()
+
+        surface = vtk.vtkContourFilter()
+        surface.SetInputConnection(splatter.GetOutputPort())
+        surface.SetValue(0, 0.01)
  
         # Create a mapper
         mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(contourFilter.GetOutputPort())
+        mapper.SetInputConnection(surface.GetOutputPort())
  
         # Create an actor
         actor = vtk.vtkActor()
@@ -68,13 +69,13 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Quadrctic Suface example")
+        self.setWindowTitle("Gaussian Splatter example")
 
     def categories(self):
-        return ['Implicit Function', 'Filters']
+        return ['Filters']
 
     def mainClasses(self):
-        return ['vtkQuadric', 'vtkSampleFunction', 'vtkContourFilter']
+        return ['vtkSphereSource', 'vtkContourFilter', 'vtkGaussianSplatter']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

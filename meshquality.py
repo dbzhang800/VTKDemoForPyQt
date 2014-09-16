@@ -24,27 +24,27 @@ class VTKFrame(QtGui.QFrame):
         self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
  
-        # Create the quadric function definition
-        quadric = vtk.vtkQuadric()
-        quadric.SetCoefficients(0.5, 1, 0.2, 0, 0.1, 0, 0, 0.2, 0, 0)
-        #quadric.SetCoefficients(0.5, 0, 0.2, 0, 0, 0, 0, 0, 0, -0.1)
+        # Create source
+        source = vtk.vtkSphereSource()
+        source.Update()
 
-        # Sample the quadric function
-        sample = vtk.vtkSampleFunction()
-        sample.SetSampleDimensions(50, 50, 50)
-        sample.SetImplicitFunction(quadric)
-        sample.SetModelBounds(-1, 1, -1, 1, -1, 1)
+        triangleFilter = vtk.vtkTriangleFilter()
+        triangleFilter.SetInputConnection(source.GetOutputPort())
+        triangleFilter.Update()
 
-        contourFilter = vtk.vtkContourFilter()
-        contourFilter.SetInputConnection(sample.GetOutputPort())
-        #contourFilter.GenerateValues(1, 1, 1)
-        contourFilter.Update()
- 
-        # Create a mapper
-        mapper = vtk.vtkPolyDataMapper()
-        mapper.SetInputConnection(contourFilter.GetOutputPort())
- 
-        # Create an actor
+        mesh = triangleFilter.GetOutput()
+        qualityFilter = vtk.vtkMeshQuality()
+        qualityFilter.SetInput(mesh)
+        qualityFilter.SetTriangleQualityMeasureToArea()
+        qualityFilter.Update()
+
+        polydata = vtk.vtkPolyData()
+        polydata.ShallowCopy(qualityFilter.GetOutput())
+
+        # Create a mapper and actor
+        mapper = vtk.vtkDataSetMapper()
+        mapper.SetInputConnection(polydata.GetProducerPort())
+        mapper.SetScalarRange(polydata.GetScalarRange())
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
  
@@ -68,13 +68,13 @@ class MainPage(QtGui.QMainWindow):
         super(MainPage, self).__init__(parent)
         self.setCentralWidget(VTKFrame())
 
-        self.setWindowTitle("Quadrctic Suface example")
+        self.setWindowTitle("Mesh Quality")
 
     def categories(self):
-        return ['Implicit Function', 'Filters']
+        return ['Filters']
 
     def mainClasses(self):
-        return ['vtkQuadric', 'vtkSampleFunction', 'vtkContourFilter']
+        return ['vtkMeshQuality', 'vtkTriangleFilter']
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
