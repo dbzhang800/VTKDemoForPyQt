@@ -14,6 +14,7 @@ from PyQt4 import QtCore, QtGui
 QtCore.Signal = QtCore.pyqtSignal
 
 import vtk
+from vtk.vtkCommonCore import reference
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 class VTKFrame(QtGui.QFrame):
@@ -50,12 +51,12 @@ class VTKFrame(QtGui.QFrame):
         interpolatedRadius = vtk.vtkTupleInterpolator()
         interpolatedRadius.SetInterpolationTypeToLinear()
         interpolatedRadius.SetNumberOfComponents(1)
-        #interpolatedRadius.AddTuple(0, [0.2,]) ### ??? Donesn't work for Python
-        #interpolatedRadius.AddTuple(1, (0.2,))
-        #interpolatedRadius.AddTuple(2, (0.2,))
-        #interpolatedRadius.AddTuple(3, (0.1,))
-        #interpolatedRadius.AddTuple(4, (0.1,))
-        #interpolatedRadius.AddTuple(5, (0.1,))
+        interpolatedRadius.AddTuple(0, [.2,])
+        interpolatedRadius.AddTuple(1, [.2,])
+        interpolatedRadius.AddTuple(2, [.2,])
+        interpolatedRadius.AddTuple(3, [.1,])
+        interpolatedRadius.AddTuple(4, [.1,])
+        interpolatedRadius.AddTuple(5, [.1,])
 
         # Generate the radius scalars
         tubeRadius = vtk.vtkDoubleArray()
@@ -65,11 +66,11 @@ class VTKFrame(QtGui.QFrame):
 
         tMin = interpolatedRadius.GetMinimumT()
         tMax = interpolatedRadius.GetMaximumT()
+        r = [reference(0.)]
         for i in range(n):
             t = (tMax - tMin) / (n - 1) * i + tMin
-            r = 1.0
-            #interpolatedRadius.InterpolateTuple(t, r) ### ??? Donesn't work for Python
-            tubeRadius.SetTuple1(i, r)
+            interpolatedRadius.InterpolateTuple(t, r)
+            tubeRadius.SetTuple1(i, r[0])
 
         # Add the scalars to the polydata
         tubePolyData = functionSource.GetOutput()
